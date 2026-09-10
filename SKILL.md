@@ -7,7 +7,7 @@ metadata:
   category: "documentation"
 ---
 
-# README Writer
+# GitHub README Writer
 
 Write the README a first-time visitor will actually read to the end, and be able to use the repo afterwards without opening the code.
 
