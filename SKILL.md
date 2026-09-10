@@ -8,174 +8,183 @@ metadata:
 
 # GitHub README Writer
 
-Write the README a first-time visitor will actually read to the end, and be able to use the repo afterwards without opening the code.
+This skill produces a README that a first-time visitor can act on without opening the code, in seven numbered steps.
 
-Ground rules that never change:
+## Ground rules
 
-- **Inventory before prose.** Every file in the folder is opened and read before one sentence is written; only vendored/generated folders, binaries and secret files are listed without reading. A README that misses a feature is wrong, not short.
-- **Nothing unverified.** Every command shown was run; every output shown is what it printed; every path, count and claim was checked in the repo. If it cannot be verified, it is not written.
-- **Reader first.** The reader is the end user of the repo, on the repo's GitHub page, with no context. Not the author, not you.
-- **Menu, not checklist.** Step 5 lists everything a README *can* contain. Pick what this repo needs. A 300-line README for a 3-file script is a failure; so is a 40-line README for a framework.
-- **Never leak, never destroy.** No content of `.env`, keys, tokens or credentials goes into the README or the inventory — only the variable *names*, from `.env.example` or the code. If a real secret file exists, tell the owner; do not print it. Never overwrite an existing README without a copy (`README.prev.md` beside it, deleted by the owner, or a clean git history). Run nothing that deploys, publishes, pushes, deletes or spends money.
+1. **Every file is read before any prose is written.** Vendored and generated folders, binaries and secret files are listed without being read; a README that omits a feature is wrong, not short.
+2. **Nothing unverified appears in the README.** Every command shown was run, every output shown is what it printed, and every path, count and claim was checked during this run.
+3. **The reader is anyone opening the repository for the first time.** The audience is narrowed only when the repository is built for one group alone, and the README states why.
+4. **The section menu in Step 5 is a menu, not a checklist.** A typical tool uses 10 to 14 of its 38 rows.
+5. **The nine writing rules in Step 6 each carry a test and a fails/passes pair.**
+6. **No secret is leaked and nothing is destroyed.** Only variable names from `.env.example` or the code appear in the README; an existing README is copied to `README.prev.md` before it is overwritten; nothing that deploys, publishes, pushes, deletes or spends money is run.
 
-## Step 1 — Inventory (do not skip, do not sample)
+## Step 1 — Inventory every file in the repository
 
-Run `python3 inventory.py <repo>` (the script sits next to this file; if the skill was installed without its scripts, the folder is `~/Downloads/github-readme-writer/`). It writes `readme-inventory.md` beside the README with every file, its size, type, first heading or docstring, and the entrypoints it detects (Python/Node/Go/Rust/Java/Kotlin/C#/shell `main`s, CLI parsers, `package.json` bin and scripts, Makefile/Justfile targets, Cargo/Go/Maven/Gradle manifests, Dockerfiles, CI workflows, slash-command folders). Secret files are listed but never read; symlinks are listed but not followed. Read that file top to bottom. If Python is unavailable, build the same tick list by hand from `find <repo> -type f`.
+`inventory.py` is the script that walks a repository and writes a checklist of every file. It sits next to this file; if the skill was installed without its scripts, the folder is `~/Downloads/github-readme-writer/`, and if it is not there either, ask the owner for the skill folder before proceeding. `python3 inventory.py <repo>` writes `readme-inventory.md` beside the README with, for each file, the path, kind, first heading or docstring, and the entry points, manifests and scripts it detects. Secret files are listed but never read; symbolic links are listed but not followed. Without Python, the checklist comes from `find <repo> -type f`.
 
-Special shapes, decided from the inventory header before reading further:
+The inventory decides four special cases before any file is read:
 
-- **Empty or binaries-only folder:** tell the owner there is nothing to document; stop.
-- **Large repo (>1,500 files) or monorepo (workspaces, several manifests):** work top-level folder by top-level folder from the "By top-level folder" map; never sample. A monorepo gets a root README that routes plus one README per package, each a separate run.
-- **Documents, not code (`.docx`, `.xlsx`, `.pptx`, `.pdf`):** convert each to text (pandoc, python-docx, openpyxl) and read it like source; the README explains what each document is for, who reads it, and in what order. Skip Install/Quickstart; keep What it is, Overview table, Status, License.
-- **Existing README:** read it first, copy it to `README.prev.md` before writing, keep every claim that the code still proves, and note in the owner message which claims were dropped and why.
+Repository shape | Action
+---|---
+Empty folder, or binaries only | Tell the owner there is nothing to document and stop.
+More than 1,500 files, or a monorepo | Work one top-level folder at a time from the "File count by top-level folder" map; never sample. A monorepo receives a routing root README plus one README per package.
+Documents rather than code (`.docx`, `.xlsx`, `.pptx`, `.pdf`) | Convert each to text and read it as source. The README states what each document is for, who reads it and in what order; Installation and Quickstart are skipped.
+An existing README | Copy it to `README.prev.md`, keep every claim the code still proves, and list each dropped claim in the owner note.
 
-Then open, in this order, and note what each one offers to the user:
+Files are then opened in this order:
 
-1. Existing README, CONTRIBUTING, CHANGELOG, LICENSE, docs/ — what the author already promised.
-2. Every entrypoint the inventory found — what a user can actually run, with which flags. Run each with `--help` or equivalent.
-3. Config and templates (`*.yaml`, `*.toml`, `.env.example`, templates/) — what a user is expected to fill in.
-4. Source folders, one by one, in inventory order. For each: what it does, for whom, what it produces. Tick it off in the inventory (`- [x]`) only after opening the file — a tick is a claim you read it. Files over 1 MB: open the head, note what it is, tick. Nested READMEs are inputs to the root README and get linked from it. The tick list is the proof that nothing was missed; leave it in `readme-inventory.md` for the next writer, or delete it before commit if the repo owner does not want it.
-5. Tests and fixtures — they show the real use cases and the exact expected outputs.
-6. Generated or vendored folders (`node_modules`, `build/`, `dist/`, caches) — list, do not read; mention only if the user must know about them.
+1. The existing README, CONTRIBUTING, CHANGELOG, LICENSE and `docs/`, which show what the author promised.
+2. Every entry point the inventory found, run with `--help`.
+3. Configuration files and templates, which show what a user must fill in.
+4. Source folders in inventory order. A line is ticked (`- [x]`) only after the file is opened; files over 1 MB are opened at the head. Nested READMEs are linked from the root README.
+5. Tests and fixtures, which show the real use cases and expected outputs.
+6. Generated and vendored folders, which are listed but not read.
 
-Stop when every line of the inventory is ticked. Not before. Verify: `grep -c '^- \[ \]' readme-inventory.md` prints `0`; that number goes into the owner note.
+The step ends when `grep -c '^- \[ \]' readme-inventory.md` prints `0`; that count goes into the owner note.
 
-## Step 2 — Decide who reads it and what they want
+## Step 2 — Define the target reader and their goal
 
-Write three lines at the top of `readme-inventory.md` before drafting (they are copied into the owner note later):
+Three lines open `readme-inventory.md` and are copied into the owner note:
 
-- **Reader:** one sentence. "A PM who never reads code and the AI agent operating the framework." "A data engineer evaluating whether to install this." "My teammate who has to run the trainer next week."
-- **Job:** what the reader wants to do in the next ten minutes after landing on the page.
-- **Doubt:** the one question that would make them leave. Usually "Does this do X?", "How hard is setup?", or "Is this maintained?"
+- **Reader:** one sentence names the reader, by default "anyone opening the repository for the first time".
+- **Goal:** one sentence states what the reader wants to do in the ten minutes after landing on the page.
+- **Doubt:** one sentence states the question that would make the reader leave, usually "Does this do X?", "How hard is setup?" or "Is this maintained?"
 
-Everything in the README serves the job and answers the doubt. If a repo has two readers (humans and AI agents; users and contributors), give the second one its own section and a redirect line under the intro, so neither has to read the other's part.
+Every section serves the goal or answers the doubt. A second reader (AI agents, contributors) receives its own section and a redirect line under the introduction.
 
-## Step 3 — Extract the offer
+## Step 3 — State what the repository offers
 
-From the inventory, write the offer in plain words, as a list you will later turn into sections:
+The offer is written as a list that later becomes sections:
 
-- What it is, in one sentence a stranger understands (name → verb phrase → for whom). This sentence is the USP: what it does that the alternatives do not.
-- The 3–7 things it does for the reader (the key features), each with the evidence file that proves it.
-- What it needs (runtime, versions, dependencies, accounts, keys) — from the code, not from memory. `import yaml` means PyYAML is a dependency even if nobody wrote it down.
-- What it deliberately does not do.
-- How a user gets from zero to first result, as the exact commands, run by you.
+- One sentence a stranger understands (name, verb phrase, for whom) states what the repository does that the alternatives do not.
+- Three to seven lines state what it does for the reader, each with the file that proves it.
+- One line states what it needs (runtime, versions, dependencies, accounts, keys), taken from the code, since `import yaml` makes PyYAML a dependency even when nothing declares it.
+- One line states what it deliberately does not do.
+- The exact commands take a user from nothing to a first result.
 
-## Step 4 — Run the demo for real
+## Step 4 — Run the commands and capture real output
 
-Before writing "Get started", do it in a scratch copy of the repo, never in the repo itself: install, initialise, run the first command, run the most common command, provoke the most common error. Capture the real output. Trim whitespace only. If the tool refuses or errors in a way the user will meet, show that verbatim too — an honest refusal message teaches more than a happy path.
+The repository's own commands are run in a scratch copy, never in the repository itself; only `readme-inventory.md`, `README.md`, `README.prev.md` and `readme-challenge.md`, plus any image produced under `docs/`, are written beside the code. The output is captured with only whitespace trimmed; a refusal or error the user will meet is shown verbatim. The commands are:
 
-When a command cannot be run here (needs an API key, a network, a GUI, another OS, a paid account) or must not be run (deploys, publishes, pushes, deletes), show the command without an output block and one line after it: "Not run while writing this README: needs X." Say the same in the owner note. Never write output you did not see. For a documents-only repo the demo is opening the main document; show its heading list instead of a terminal output.
+1. Install.
+2. Run the first command.
+3. Run the most common command.
+4. Provoke the most common error.
 
-Numbers you state (steps, commands, files, test cases) come from a script or a count you ran now, never from an older README.
+A command that cannot be run here (it needs a key, a network, a GUI, another OS or a paid account) or must not be run (it deploys, publishes, pushes or deletes) is shown without output, followed by one line: "Not run while writing this README: needs X." The owner note repeats this. For a documents-only repository the demonstration is the main document's heading list.
 
-## Step 4b — Make the visuals (do not wait for them to exist)
+### Screenshots and diagrams
 
-A README about something visible shows it. If `docs/` or the old README has no usable image, make one now and save it under `docs/` (PNG for stills, GIF under 5 MB for motion), then reference it by relative path:
+When no usable image of something visible exists, one is produced, saved under `docs/` (PNG for stills, GIF under 5 MB for motion) and referenced by relative path:
 
-- **Web UI or HTML output:** open it in a headless browser (Playwright/Chromium), 1440×900, take a screenshot of the main view; a second one of the most-used sub-view if it differs.
-- **CLI / TUI:** a fenced code block with the real output is the screenshot; use an image only if colour or layout carries meaning.
-- **Pipeline, state machine, multi-step flow:** an ASCII arrow line or a Mermaid diagram generated from the source (steps, edges), not drawn from memory.
-- **Documents-only repo:** a table of the documents in reading order beats an image.
-- **Nothing visible (a library, a pure API):** skip item 2 of the menu; do not fake a hero image.
-- **Architecture (menu item 12):** derive boxes from top-level folders/modules and arrows from imports or calls the inventory found; draw it as Mermaid so it stays diffable; render to PNG only if the host cannot show Mermaid.
+Subject | Visual to produce
+---|---
+Web UI or HTML output | A headless-browser screenshot of the main view at 1440 by 900.
+CLI or TUI | A fenced code block with the real output; an image only when colour or layout carries meaning.
+Pipeline, state machine or multi-step flow | A Mermaid diagram generated from the source, with every label a noun phrase understood on its own.
+Documents-only repository | A table of the documents in reading order.
+Library or pure API | No image; the demo row of the menu (Step 5, row 2) is skipped.
+Architecture (Step 5, row 12) | A Mermaid diagram whose boxes are the top-level modules and whose arrows are the imports the inventory found.
 
-Every image needs alt text that says what it shows. Regenerate images whenever the thing they show changed; a stale screenshot is a false claim.
+Every image carries alt text stating what it shows and is regenerated when its subject changes.
 
-## Step 5 — The menu
+## Step 5 — Select sections from the menu
 
-Pick from this list. Order is the order that works for most developer tools; keep it unless the repo has a reason. Every item names the repos where the pattern is strongest, so you can look at them when unsure.
+The order below suits most developer tools.
 
-| # | Section | What goes in it | Use when |
-|---|---|---|---|
-| 1 | **Hero** | H1 (emoji optional), italic one-line tagline (the USP: what this does that the alternatives do not), one bold sentence that expands it, 2–4 badges that mean something (version, license, works-with, tests passing, eval score, status). No vanity badges. | Always |
-| 2 | **Demo visual** | Screenshot or GIF directly under the badges, before any prose (made in Step 4b if absent). Show the thing working, not the logo. | Anything with a UI, a terminal UX, or output worth seeing |
-| 3 | **Try it without installing** | Link to a hosted demo, playground, notebook or sample output; one line on what to type first. | A live instance or runnable notebook exists |
-| 4 | **What it is** | 2–4 sentences: who, what, what happens after. Then one 2-line code block: the first command a user runs. | Always — a working command in the first screen |
-| 5 | **Redirect** | Blockquote: "> Are you X? Jump to [section]." | Two audiences |
-| 6 | **Table of contents** | Links to every H2. | More than ~6 H2s |
-| 7 | **At a glance** | One small table of the numbers that prove it is real: tests, eval scores, size, supported platforms, last checked date. Every number counted now. | Numbers exist |
-| 8 | **Why / Highlights** | 5–7 bullets, each a concrete claim the repo backs up (the key features). Bold lead-in, one sentence after. | Anything with alternatives |
-| 9 | **Compared to** | Table: this vs the thing the reader uses today (a general chatbot, the manual process, the incumbent tool). Rows are user outcomes, not features. | An obvious alternative exists |
-| 10 | **Concepts** | Glossary table of the 5–10 terms the README uses that the reader may not know; one line each, plain words. Optionally a short "new to X? start here" paragraph. | Domain or technique jargon (RAG, reranking, state machine, actuarial…) |
-| 11 | **Overview table** | One table of the repo's main parts: name, what question it answers, size, what you get. | Multi-part systems (workflows, modules, agents, services) |
-| 12 | **Architecture** | A diagram of the components and the data flow between them (boxes = modules/services, arrows = data), generated from the repo's folders and imports, plus one paragraph "where does the work happen" (local, API, browser). Mermaid or an image from Step 4b. | More than one moving part |
-| 13 | **How it flows** | ASCII arrow line or Mermaid diagram of the main path a request takes, gates marked. | The user must understand an order of operations |
-| 14 | **Install** | Per platform / per tool, bold label + code block. Rare paths inside `<details>`. | Anything installed |
-| 15 | **Configuration** | Table of every setting the user must or may set: name, what it does, default, where to get it. Names only; never values. | `.env.example`, config files, CLI flags |
-| 16 | **Quickstart** | 3–7 numbered lines, **bold verb** + `command`. Fits on one screen. | Always |
-| 17 | **Get started, step by step** | One H3 per step, 1–2 sentences of intent, exact command with a realistic argument (a real sentence, not `<thing>`), then the real output. Finish with "what if it refuses / fails". | Anything with more than one step |
-| 18 | **Worked example** | One realistic end-to-end case in the reader's domain: what they type at each point, what appears on disk. Plus 3–6 example inputs the reader can paste. | Frameworks, pipelines, agents, assistants |
-| 19 | **Reference tables** | Commands, flags, config keys, steps, files — one table each, complete, generated from the source when possible. Long ones inside `<details>`. | Anything with more than ~5 commands/options |
-| 20 | **How it works** | 3–5 plain bullets on the mechanism, then a `<details>` with the file layout tree. No code. | Anything a user might not trust |
-| 21 | **Tech stack** | Table: tool, what it is responsible for, why this one (one honest reason each). | More than ~3 dependencies or services |
-| 22 | **Data sources** | Where the data/corpus/models come from, licence, date fetched, how to refresh. | The repo ships or downloads data |
-| 23 | **Tests & evaluation** | The command to run them, the real result, and one line per metric on what the number means and how big the test set is. | Tests or an eval script exist |
-| 24 | **Safety & responsible use** | What it refuses, what it must not be used for, the disclaimer (not a medical/legal/financial device), how AI output is checked. | Health, finance, legal, minors, or any AI-generated output |
-| 25 | **Troubleshooting** | Table: symptom → likely cause → fix, from real errors you hit in Step 4; then "debug one stage at a time" commands. | Anything with setup or external services |
-| 26 | **Runtime & cost** | Where computation happens, what needs a key or network, rough cost per run. | Paid APIs, GPUs, hosted services |
-| 27 | **Deploy** | The one supported way to host it, its commands, and what to set there. | The repo is meant to be hosted |
-| 28 | **For AI agents / For contributors** | Written to that reader: where state lives, what not to do, where the rules are, a code reading order (first file to open, then next). Link AGENTS.md / CONTRIBUTING.md. | Second audience exists |
-| 29 | **Supported platforms / integrations** | Table: platform, how to install, how to invoke. | Multi-tool support |
-| 30 | **Customizing** | `Goal → Edit this → Then run` table. | Anything configurable |
-| 31 | **FAQ** | 3–6 real questions (from issues, from the doubt in Step 2). Never restate the Why bullets. | Recurring questions exist |
-| 32 | **Prerequisites** | Exact runtime versions and dependencies, from the code. | Always, short |
-| 33 | **Limits / What it is not** | 2–5 honest limits and non-goals. | Always for tools; skip for pure docs repos |
-| 34 | **Status & roadmap** | One line: working / beta / archived, date checked. Optionally a checklist of what is next, unchecked boxes only for things actually planned. | Always, one line |
-| 35 | **Learn more** | Links to deeper docs in the repo. | docs/ exists |
-| 36 | **Support / Contributing** | Where to ask, where to file; link the file rather than inlining rules. | Public repos |
-| 37 | **Acknowledgements** | Name what you borrowed from. | You borrowed |
-| 38 | **License** | One line. If no LICENSE file exists, say "No license yet" — do not invent one. | Always, last |
+Row | Section | Content | When it is used
+---|---|---|---
+1 | **Hero block** | The H1, an italic tagline stating what this does that alternatives do not, one bold sentence expanding it, and two to four informative badges. | Every README.
+2 | **Demo screenshot or recording** | A screenshot or GIF under the badges, before any prose, showing the tool working. | A UI, terminal experience or visible output exists.
+3 | **Hosted demo** | A link to a hosted instance or notebook, with one line on what to type first. | A live instance exists.
+4 | **Purpose and first command** | Two to four sentences on who it is for and what it does, then a code block with the first command. | Every README.
+5 | **Audience redirect** | A blockquote that sends the second reader to their section. | Two audiences exist.
+6 | **Table of contents** | Links to every H2. | More than six H2 headings exist.
+7 | **Key numbers** | One table of numbers that prove the project is real, each counted during this run. | Such numbers exist.
+8 | **Key features** | Five to seven bullets, each a bold lead-in sentence and one sentence of evidence. | Alternatives exist.
+9 | **Comparison with alternatives** | A table of this tool against what the reader uses today; rows are user outcomes. | An obvious alternative exists.
+10 | **Glossary of terms** | A table of the five to ten terms the reader may not know, one line each. | The domain has jargon.
+11 | **Overview table** | One table of the main parts: name, purpose, what it produces. | The system has several parts.
+12 | **Architecture** | The Step 4 diagram plus one paragraph on where the work happens. | More than one moving part exists.
+13 | **Main path of a run** | A diagram of the path a request takes, with gates marked. | An order of operations matters.
+14 | **Installation** | One H3 heading and one code block per platform; rare paths inside `<details>`. | Anything is installed.
+15 | **Configuration** | A table of every setting: name, effect, default, source. Values are never shown. | Configuration files or CLI flags exist.
+16 | **Quickstart** | Three to seven numbered lines, each a full sentence starting with the action and followed by its command. | Every README.
+17 | **Step-by-step walkthrough** | One H3 per step with its intent, a command with a realistic argument, and its real output; the last step covers failure. | More than one step exists.
+18 | **Worked example** | One end-to-end case in the reader's domain, plus three to six inputs the reader can paste. | The repository is a framework, pipeline or agent.
+19 | **Reference tables** | One complete table each for commands, flags, keys, steps and files; long tables inside `<details>`. | More than five commands or options exist.
+20 | **How it works** | Three to five bullets on the mechanism, then the file layout inside `<details>`. | The reader may not trust the tool.
+21 | **Technology stack** | A table of each tool, its responsibility and one verifiable reason for the choice. | More than three dependencies exist.
+22 | **Data sources** | Origin, licence, fetch date and refresh method for the data or models. | The repository ships or downloads data.
+23 | **Tests and evaluation** | The command, the real result, and one line per metric on its meaning. | Tests or an evaluation script exist.
+24 | **Safety and responsible use** | What the tool refuses, what it must not be used for, and how AI output is checked. | The domain is sensitive or AI output is produced.
+25 | **Troubleshooting** | A table of symptom, cause and fix from the errors met in Step 4. | Setup or external services exist.
+26 | **Runtime and cost** | Where computation happens, what needs a key or network, and the cost per run. | Paid APIs, GPUs or hosted services are used.
+27 | **Deployment** | The one supported way to host the tool and what to set there. | The repository is meant to be hosted.
+28 | **For AI agents, or For contributors** | Where state lives, what not to do, where the rules are, and the code reading order. | A second audience exists.
+29 | **Supported platforms and integrations** | A table of platform, installation and invocation. | Several platforms are supported.
+30 | **Customization table** | A table of goal, file to edit, and command to run afterwards. | The tool is configurable.
+31 | **Frequently asked questions** | Three to six real questions that do not restate the key features. | Recurring questions exist.
+32 | **Prerequisites** | The exact runtime versions and dependencies, taken from the code. | Every README, kept short.
+33 | **Limits and non-goals** | Two to five honest limits. | Every tool.
+34 | **Status and roadmap** | One line stating working, beta or archived, with the date checked; the date answers "is this maintained?". | Every README.
+35 | **Further documentation** | Links to the deeper documents in the repository. | `docs/` exists.
+36 | **Support and contributing** | Where to ask and where to file, with the rules file linked. | The repository is public.
+37 | **Acknowledgements** | The sources the project borrowed from. | Something was borrowed.
+38 | **License** | One line; "No license yet" when no LICENSE file exists. | Every README, last.
 
-Outside the README but part of the job: tell the owner to set the repo description, topics and a social-preview image (Settings → General), because that is what a link to the repo shows before the README is opened.
+Interview questions and "learning outcomes" sections are rejected because they serve the author, not the reader. The owner is told to set the repository description, topics and social-preview image, which a link shows before the README.
 
-A 38-row menu is not a 38-section README. A typical tool uses 10–14 rows; a course project that uses 35 of them is the failure the cut test in `CHALLENGER.md` exists for. Rejected on purpose: interview Q&A and "learning outcomes" sections — they serve the author's portfolio, not the reader.
+## Step 6 — Write the draft under the writing rules
 
-Repos that do these well, for reference when a section feels off: github/spec-kit (get-started steps with real prompts; command tables split core/optional; quickstart as bold-verb list), astral-sh/uv (highlights with concrete claims; FAQ), fastapi/fastapi (run it → check it, with output), httpie/cli and charmbracelet/gum (demo GIF first; one section per command), BurntSushi/ripgrep ("why should I" *and* "why shouldn't I"), openai/openai-agents-python (code → **Output:** block; redirect blockquote), anthropics/claude-code (whole README under 80 lines when the docs live elsewhere).
+Each rule carries a test and an example pair. CHALLENGER.md tests the rules under the same labels, R1 to R9.
 
-## Step 6 — Write in plain words
+1. **R1 The register is professional.** Test: every sentence, bullet, label, prose table cell and bold lead-in has a subject and a verb; no heading is a question; no sentence is true of every repository; no opener is casual.
+   Fails: "Nothing skipped." and "Why this and not a template?"
+   Passes: "Every file is read before writing begins." and "Differences from a README template"
+2. **R2 The reader is anyone opening the repository for the first time.** Test: a narrower group is named only when the inventory shows the repository is built for that group alone.
+   Fails: "a README a developer or PM can use"
+   Passes: "a README anyone opening the repository for the first time can use"
+3. **R3 Parallel items are structured.** Test: three or more parallel items form a list or table; items with sub-parts form a nested list or a table with one column per part; no paragraph exceeds four sentences.
+   Fails: three sentences in a row, one per script.
+   Passes: a table with the columns Script, Purpose, Output and Exit status.
+4. **R4 Every element passes the value test.** Test: the reader would decide or act differently without it. File sizes, line counts, byte totals and "checked on" dates fail unless they answer a stated doubt.
+   Fails: a Size column reading "181 lines".
+   Passes: a Status line with a date, because the date answers "is this maintained?"
+5. **R5 Names are understood alone.** Test: the heading, step name, diagram label or bold lead-in is read out of context and still states its content; a noun phrase is preferred to a question.
+   Fails: "Decide who reads it"
+   Passes: "Define the target reader and their goal"
+6. **R6 Terms are introduced before use.** Test: the file name, command or term is covered and the preceding sentence still tells the reader what it does.
+   Fails: "`lint.py` exits 1 on broken links."
+   Passes: "`lint.py` is the checker that rejects a README with a broken link; it exits 1 on the first finding."
+7. **R7 Each concept is explained once.** Test: a term receives one plain line on first use; a concept covered in SKILL.md is linked from the README, not repeated. The README body is 400 to 900 words for a small tool and never more than 1,800.
+   Fails: a purpose paragraph that restates the flow diagram.
+   Passes: "The seven steps are listed in [SKILL.md](SKILL.md)."
+8. **R8 Each sentence states what the reader gets or does.** Test: the sentence answers "what do I get?" or "what do I do?"; a sentence that only describes machinery is cut, and internal terms ("Step 4") stay out of the README.
+   Fails: "Step 1 ends only when the grep count prints 0."
+   Passes: "The README is written only after every file on the checklist has been read."
+9. **R9 Numbers replace adjectives, and every step is one action.** Test: a claim carries a count made during this run; a command carries a realistic argument (`~/Downloads/my-repo`, not `<path>`) and its output where it was run.
+   Fails: "a fast and thorough checker"
+   Passes: "The inventory script lists 66 files in under one second."
 
-The reader has never seen this repo, is short on time, and wants to act. Write so they can.
+Form rules: the first 50 words state what the tool is, what makes it different and for whom; a command appears before the first scroll; emoji appear on H2 headings only or nowhere. The final read is done as the reader from Step 2: every sentence that reader would skip is cut, and every sentence that reader would re-read is rewritten.
 
-**Voice rules (each one has a test):**
+## Step 7 — Second review and lint check
 
-1. **Say what the reader gets or does, not how the tool works inside.** Test: does the sentence answer "what do I get?" or "what do I do?" If it only describes machinery, cut it or move it to the agent's file.
-   Bad: "Step 1 ends only when `grep -c '^- \[ \]' readme-inventory.md` prints `0`."
-   Good: "You get a checklist of every file in the repo. The README is not written until every line is ticked."
-2. **Introduce before you use.** A file name, command, or term appears in prose only after one sentence has said what it is for. Test: cover the name — can the reader still tell what it does?
-3. **One idea per sentence, one job per section.** Sentences under 20 words. A section heading is the question the reader has ("How do I install it?"), not a label ("Installation").
-4. **Numbers over adjectives, verbs over nouns.** "Checks 66 files in 2 seconds" beats "fast and thorough". "Finds broken links" beats "link validation".
-5. **No filler, no marketing.** Cut "powerful", "seamless", "robust", "simply", "just", "easy", "comprehensive", "leverage", "empower", "unlock", "ensure", "delve", "streamline", "elevate". Cut any sentence that would be true of every repo on GitHub.
-6. **Steps are numbered and each is one action.** Commands come with a realistic argument (`~/Downloads/my-repo`, not `<path>`) and, where run, their output.
-7. **Explain the first time, then stop.** A concept gets one plain-language line on first use and never gets re-explained.
-8. **Lead every section with the payoff.** First line: what the reader gets. Then how. Never the reverse.
-9. **Internal terms stay internal.** "Step 4b", "the challenger pass", "tick the inventory" belong to the agent and the owner note; the README says "a second review", "a checklist of files".
+`CHALLENGER.md`, the file next to this one, lists the review tests and the acceptance criteria A1 to A10. The draft goes to a second, independent pass in a fresh context with the repository, the inventory and that file; when no fresh context exists, the writer performs the pass after finishing the draft and says so in the owner note. The pass re-runs every command, checks every count, path, link and anchor, confirms that no secret value appears, scores the draft against A1 to A10, and writes `readme-challenge.md` beside the README. One round consists of three actions:
 
-**Form rules:** body prose 600–1,800 words for a tool or framework (a 3-file script or a documents-only repo may go down to 150; tables and code blocks do not count; deeper material goes to `docs/` with a link). First 50 words answer what, why different, for whom. A command before the first scroll. Emoji on H2 only, or nowhere. Every relative link and image exists; every TOC anchor matches GitHub's rule (lowercase, spaces → `-`, punctuation and emoji stripped, one leading `-` if the heading started with an emoji).
+1. The reviewer scores the draft against A1 to A10 and writes `readme-challenge.md`.
+2. The writer applies every must-fix finding (one that makes any of A1 to A10 false) and applies or rejects each should-fix finding with a reason in the owner note.
+3. The writer runs `lint.py`.
 
-**Final read:** read the whole page once as the reader from Step 2, out loud in your head. Every sentence you would skip, cut. Every sentence you would stop and re-read, rewrite.
+Rounds repeat until a round reports zero must-fix findings, for at most three rounds; after a third failing round the open criteria go into the owner note and the README does not ship.
 
-## Step 7 — Challenge, then lint
-
-Hand the draft to a second, independent pass (a fresh agent or a fresh context; if neither exists, re-open the inventory and do the pass yourself after finishing the draft, and say so in the owner note) with the inventory and this instruction: *re-run every command, diff every output, check every count, path, link and anchor, check that no secret value appears, flag every sentence a first-time reader would not understand, flag anything derivable from something already said.* The second pass follows `CHALLENGER.md` (next to this file) and writes `readme-challenge.md` beside the README. Fix every confirmed finding. Then run `python3 lint.py <repo>/README.md` (next to this file): it fails on broken relative links and images (markdown, reference-style and HTML), anchors that match no heading, an unclosed code fence, placeholders in prose or in commands (`<thing>`, TODO, lorem), banned words, a missing first-screen code block, a missing License heading, and prose over 1,800 words (under 150 is a warning).
-
-Do not ship a README that has not been through both.
-
-## Anti-patterns (each one seen in a real repo)
-
-- Listing folders instead of explaining what the user can do ("`src/` — source code").
-- Commands without output; output nobody ran.
-- Installation sprawl: twenty platforms uncollapsed, quick examples buried underneath.
-- Contributor build steps mixed into end-user steps.
-- Feature claims copied from an older README the code has outgrown (a count of tests, a version, a dependency).
-- A product screenshot standing in for a mechanism explanation, or a mechanism explanation where a screenshot would do.
-- FAQ that restates the Why bullets.
-- No limits section, so the reader discovers the limit after installing.
-- A README that is the only documentation and therefore 4,000 words long.
-- A real value from `.env` (a key, a hostname, a password) pasted as the "example".
+`lint.py` is the checker that runs after the review: `python3 lint.py <repo>/README.md`. It fails on the faults its docstring lists: broken links and images, anchors that match no heading, an unclosed code fence, placeholders, filler words, a missing first-screen command or License heading, and body prose over 1,800 words. A README ships only after both passes.
 
 ## Outputs of one run
 
-1. `README.md` — the deliverable.
-2. `readme-inventory.md` — the ticked inventory with the three Step 2 lines on top (keep or delete per repo owner's wish; never commit it half-ticked). `README.prev.md` if a README existed.
-3. `readme-challenge.md` — the second pass's cut/prove/add/move list (same keep-or-delete rule).
-4. A short note to the owner: reader, job, doubt; files ticked / total; sections chosen and why, sections skipped and why; commands not run and why; claims from the old README that were dropped; anything in the repo the README could not honestly claim; whether the challenge pass was a second agent or yourself.
+1. `README.md` is the deliverable, with `README.prev.md` beside it when a README existed.
+2. `readme-inventory.md` is the ticked inventory with the three Step 2 lines on top, kept or deleted at the owner's wish and never committed half-ticked.
+3. `readme-challenge.md` is the second pass's findings and A1 to A10 score, kept or deleted on the same rule.
+4. The owner note states the reader, goal and doubt; files ticked out of the total; sections chosen and skipped, with reasons; commands not run; claims dropped from the old README; and whether the review was a second agent or the writer.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lint a README against the github-readme-writer rules. Exit 1 on any finding.
+"""Check a README against the github-readme-writer rules; exit 1 on any finding.
 
 usage: python3 lint.py <README.md> [--max-body-words 1800] [--min-body-words 150]
 
@@ -72,7 +72,7 @@ def main():
     a = ap.parse_args()
     path = Path(a.readme)
     if not path.is_file():
-        sys.exit(f"no file: {path}")
+        sys.exit(f"The path is not a file: {path}")
     root = path.parent
     text = path.read_text(encoding="utf-8", errors="replace")
     lines = text.splitlines()
@@ -101,21 +101,21 @@ def main():
             continue
         body.append((i, line))
     if in_code:
-        findings.append(f"unclosed code fence opened at line {fence_line}; everything after it renders as code")
+        findings.append(f"A code fence opened at line {fence_line} is never closed; everything after it renders as code.")
     for hm in re.finditer(r"<h([1-6])[^>]*>(.*?)</h\1>", text, re.S | re.I):
         headings.append(re.sub(r"<[^>]+>", "", hm.group(2)).strip())
     if not headings:
-        findings.append("no heading at all")
+        findings.append("The file contains no heading.")
     if not code_first40:
-        findings.append("no code block in the first 40 lines — the first screen must show a command")
+        findings.append("No code block appears in the first 40 lines; the first screen must show a command.")
 
     body_text = "\n".join(l for _, l in body)
     no_links = re.sub(r"!\[[^\]]*\]\([^)]*\)|\[([^\]]*)\]\([^)]*\)", r"\1", body_text)
     words = len(re.findall(r"\b\w+\b", no_links))
     if words > a.max_body_words:
-        findings.append(f"body prose is {words} words (> {a.max_body_words}); move depth to docs/")
+        findings.append(f"Body prose is {words} words, above the limit of {a.max_body_words}; move deeper material to docs/.")
     if words < a.min_body_words:
-        print(f"warning: body prose is {words} words (< {a.min_body_words}); fine for a tiny repo, otherwise the reader will not get context")
+        print(f"Warning: body prose is {words} words, below the minimum of {a.min_body_words}; acceptable for a very small repository, otherwise the reader will lack context.")
 
     # Anchors, with GitHub's -1, -2 suffixes for duplicate headings.
     anchors, seen = set(), {}
@@ -134,12 +134,12 @@ def main():
             return  # http:, https:, mailto:, tel:, data: …
         if target.startswith("#"):
             if target[1:].lower() not in anchors:
-                findings.append(f"{where}: anchor {target} matches no heading")
+                findings.append(f"{where}: the anchor {target} matches no heading.")
             return
         file_part = target.split("#")[0].split("?")[0]
         p = (root / file_part.lstrip("/")).resolve() if file_part.startswith("/") else (root / file_part).resolve()
         if not p.exists():
-            findings.append(f"{where}: link target does not exist: {target}")
+            findings.append(f"{where}: the link target does not exist: {target}")
 
     code_lines = {ln for ln, _ in code}
     noncode = "\n".join("" if i in code_lines else l for i, l in enumerate(lines, 1))  # line numbers preserved
@@ -152,17 +152,17 @@ def main():
         stripped = re.sub(r"`[^`]*`", "", line)
         stripped = re.sub(r"!?\[[^\]]*\]\([^)]*\)", "", stripped)
         for m in PLACEHOLDER_TEXT.finditer(stripped):
-            findings.append(f"line {ln}: placeholder text {m.group(0)!r}")
+            findings.append(f"line {ln}: the placeholder text {m.group(0)!r} remains in prose.")
         for m in ANGLE.finditer(stripped):
             if is_placeholder(m.group(1)):
-                findings.append(f"line {ln}: placeholder {m.group(0)!r} in prose — use a real value")
+                findings.append(f"line {ln}: the placeholder {m.group(0)!r} appears in prose; use a real value.")
     for ln, line in code:
         cmd = re.sub(r"\s#.*$", "", line.strip())  # drop a trailing comment
         if not RUNNER.match(cmd):
             continue  # output, file trees and comments may legitimately show <thing>
         for m in ANGLE.finditer(cmd):
             if is_placeholder(m.group(1)):
-                findings.append(f"line {ln}: placeholder {m.group(0)!r} in a command — show a realistic argument")
+                findings.append(f"line {ln}: the placeholder {m.group(0)!r} appears in a command; show a realistic argument.")
 
     # Banned words: whole words, prose only, code spans and link targets exempt.
     for ln, line in body:
@@ -172,10 +172,10 @@ def main():
         for w in BANNED:
             for m in re.finditer(rf"(?<![\w-]){re.escape(w)}(?![\w-])", stripped, re.I):
                 ctx = stripped[max(0, m.start() - 25):m.end() + 25].strip()
-                findings.append(f"line {ln}: banned word {w!r}: …{ctx}…")
+                findings.append(f"line {ln}: the banned word {w!r} appears in prose: …{ctx}…")
 
     if not any(re.search(r"\blicen[cs]e\b", h, re.I) for h in headings):
-        findings.append("no License section (say 'No license yet' if there is no LICENSE file)")
+        findings.append("No License heading exists; write 'No license yet' when the repository has no LICENSE file.")
 
     findings = list(dict.fromkeys(findings))
     if findings:
@@ -183,7 +183,7 @@ def main():
         for f in findings:
             print(f"  - {f}")
         sys.exit(1)
-    print(f"OK — {path}: {len(headings)} headings, {words} body words, links and anchors resolve")
+    print(f"OK — {path}: {len(headings)} headings, {words} body words; every link and anchor resolves.")
 
 
 if __name__ == "__main__":

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Walk a repository and write readme-inventory.md: every file, nothing skipped.
+"""Walk a repository and write readme-inventory.md, a checklist that lists every file.
 
 usage: python3 inventory.py <repo> [--out <path>]
 
-For each file: path, size, kind, first heading / docstring / comment line, and
+For each file: path, kind, first heading / docstring / comment line, and
 what it lets a user run (entrypoints). Vendored and generated folders are
 listed by name with a file count but not opened. Secret files (.env, keys,
 credentials) are listed but their content is never shown. The writer ticks
@@ -40,7 +40,7 @@ LARGE = 1_000_000  # bytes; flagged so the writer decides whether to open it
 # (regex, label, suffixes it applies to; None = any text file)
 ENTRY_HINTS = [
     (r"^\s*if __name__ == ['\"]__main__['\"]", "python script (`python3 {p}`)", {".py"}),
-    (r"argparse\.ArgumentParser|click\.(command|group)|typer\.Typer|docopt\(", "CLI with flags — run with --help", {".py"}),
+    (r"argparse\.ArgumentParser|click\.(command|group)|typer\.Typer|docopt\(", "CLI with flags; run it with --help", {".py"}),
     (r"^\s*def main\(", "has main()", {".py"}),
     (r"\bsys\.argv\b", "reads sys.argv", {".py"}),
     (r"=\s*(FastAPI|Flask|express|fastify|Hono)\(|http\.ListenAndServe\(|^use (actix_web|axum)\b", "web server", None),
@@ -137,7 +137,7 @@ def summarize(path: Path, text: str) -> str:
 def read_text(path: Path, size: int):
     """Return (text or None, note). None means: binary or secret, not read."""
     if not SECRET_ALLOW.search(path.name) and SECRET_NAMES.match(path.name):
-        return None, "SECRET — listed, not read; never copy into a README"
+        return None, "SECRET file, listed but not read; never copy its content into a README"
     try:
         with open(path, "rb") as f:
             head = f.read(min(size, 200_000))
@@ -207,11 +207,11 @@ def special(path: Path, rel: str, text):
     if re.search(r"(^|/)(commands|skills|prompts|agents)/", rel):
         notes.append("command/skill template")
     if re.search(r"(^|/)(tests?|__tests__|spec|specs|fixtures)/|(^|/)(test_[^/]+|[^/]+_test|[^/]+\.test|[^/]+\.spec)\.[a-z]+$", rel):
-        notes.append("test/fixture — shows real use and expected output")
+        notes.append("test or fixture; shows real use and expected output")
     if name.lower() == "license" or name.lower().startswith(("license.", "licence")):
         notes.append("LICENSE present")
     if name.lower() in {"readme.md", "readme.rst", "readme.txt", "readme"} and text is not None:
-        notes.append(f"existing README, {len(text.split())} words — keep a copy before rewriting")
+        notes.append(f"existing README of {len(text.split())} words; keep a copy before rewriting")
     return notes
 
 
@@ -239,13 +239,13 @@ def gitignored(root: Path):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("repo")
-    ap.add_argument("--out", default=None, help="default: <repo>/readme-inventory.md")
+    ap.add_argument("--out", default=None, help="path of the checklist to write; the default is <repo>/readme-inventory.md")
     a = ap.parse_args()
     root = Path(a.repo).resolve()
     if not root.exists():
-        sys.exit(f"does not exist: {root}")
+        sys.exit(f"The path does not exist: {root}")
     if not root.is_dir():
-        sys.exit(f"not a directory (pass the repo folder, not a file): {root}")
+        sys.exit(f"The path is not a directory; pass the repository folder, not a file: {root}")
     out = Path(a.out).resolve() if a.out else root / "readme-inventory.md"
     ignored = gitignored(root)
 
@@ -280,9 +280,9 @@ def main():
     walk(root)
 
     lines = [f"# Inventory of `{root.name}`", "",
-             "Tick every line as you read the file. An unticked line is a gap in the README.", ""]
+             "Tick every line after reading the file. An unticked line is a gap in the README.", ""]
     if not files and not skipped and not links:
-        lines += ["**The folder is empty.** There is nothing to document; tell the owner.", ""]
+        lines += ["The folder is empty; there is nothing to document. Tell the owner.", ""]
 
     # Top-level map first, so a monorepo can be split into passes without losing count.
     top = {}
@@ -291,13 +291,13 @@ def main():
         key = rel.parts[0] + "/" if len(rel.parts) > 1 else "(root)"
         top[key] = top.get(key, 0) + 1
     if len(files) > 40:
-        lines += ["## By top-level folder", ""] + [f"- `{k}` — {n} files" for k, n in sorted(top.items(), key=lambda kv: -kv[1])] + [""]
+        lines += ["## File count by top-level folder", ""] + [f"- `{k}` — {n} files" for k, n in sorted(top.items(), key=lambda kv: -kv[1])] + [""]
         if len(files) > 1500:
-            lines += [f"**Large repo ({len(files)} files).** Work folder by folder from the map above; "
-                      "do not sample. If the repo is a monorepo, one README per package plus a root README that routes.", ""]
+            lines += [f"This is a large repository ({len(files)} files). Work folder by folder from the map above and do not sample. "
+                      "A monorepo receives one README per package plus a root README that routes readers to them.", ""]
 
-    lines += ["## Files", ""]
-    deps, total_bytes, secrets = set(), 0, []
+    lines += ["## Every file in the repository", ""]
+    deps, secrets = set(), []
     for p in files:
         rel = p.relative_to(root).as_posix()
         try:
@@ -305,7 +305,6 @@ def main():
         except OSError as e:
             lines.append(f"- [ ] `{rel}` (unreadable: {e.strerror})")
             continue
-        total_bytes += size
         text, note = read_text(p, size)
         k = kind(p, text)
         notes = [note] if note else []
@@ -324,24 +323,24 @@ def main():
                     deps.add(m.group(1))
         elif k == "office":
             summary = office_title(p)
-            notes.append("office document — convert to text to read it (e.g. pandoc, python-docx/openpyxl)")
+            notes.append("office document; convert it to text before reading (pandoc, python-docx or openpyxl)")
         if size >= LARGE:
-            notes.append(f"large ({size/1e6:.1f} MB) — decide whether the user must know about it")
+            notes.append(f"large file ({size/1e6:.1f} MB); decide whether the user must know about it")
         notes += special(p, rel, text)
         desc = " — ".join(x for x in [summary[:110], "; ".join(dict.fromkeys(notes))] if x)
-        lines.append(f"- [ ] `{rel}` ({size:,} B, {k}){' — ' + desc if desc else ''}")
+        lines.append(f"- [ ] `{rel}` ({k}){' — ' + desc if desc else ''}")
 
     if links:
-        lines += ["", "## Symlinks (listed, not followed)", ""]
+        lines += ["", "## Symbolic links, listed but not followed", ""]
         lines += [f"- [ ] `{rel}` → `{tgt}`" + ("" if ok else " — **broken**") for rel, tgt, ok in links]
     if unreadable:
-        lines += ["", "## Could not list", ""] + [f"- `{rel}/` — {err}" for rel, err in unreadable]
+        lines += ["", "## Folders that could not be listed", ""] + [f"- `{rel}/` — {err}" for rel, err in unreadable]
 
-    lines += ["", "## Not opened (vendored / generated)", ""]
+    lines += ["", "## Vendored and generated folders, listed but not opened", ""]
     lines += [f"- `{rel}/` — {n} files" + (f" (e.g. {', '.join('`'+x+'`' for x in ex)})" if ex else "")
               for rel, n, ex in skipped] or ["- none"]
     if secrets:
-        lines += ["", "## Secret files (never quote their content; document only that they must exist)", ""]
+        lines += ["", "## Secret files, listed but not read (document that they must exist; never quote their content)", ""]
         lines += [f"- `{s}`" for s in secrets]
     stdlib_guess = set(getattr(sys, "stdlib_module_names", ())) | {
         "os", "sys", "re", "json", "pathlib", "argparse", "subprocess", "typing", "datetime",
@@ -358,9 +357,9 @@ def main():
     local = {p.stem for p in files if p.suffix == ".py"} | {p.name for p in files if (p / "__init__.py").exists()}
     local |= {q.parent.name for q in files if q.name == "__init__.py"}
     third = sorted(d for d in deps if d not in stdlib_guess and d not in local)
-    lines += ["", "## Python imports that are not stdlib (verify each is declared)", "",
+    lines += ["", "## Python imports outside the standard library (verify that each is declared as a dependency)", "",
               ", ".join(f"`{d}`" for d in third) if third else "none"]
-    lines += ["", f"Total: {len(files)} files, {total_bytes:,} bytes listed; {len(links)} symlinks; "
+    lines += ["", f"Total: {len(files)} files listed; {len(links)} symlinks; "
               f"{len(skipped)} folders not opened; {len(secrets)} secret files not read."]
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("\n".join(lines) + "\n", encoding="utf-8")
