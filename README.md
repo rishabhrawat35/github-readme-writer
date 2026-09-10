@@ -2,7 +2,7 @@
 
 *Read every file, run every command, then write the README a stranger can use.*
 
-**A skill for Claude (or any AI agent) that inventories a repository file by file, runs its commands in a scratch copy, and writes a README with real output and only the sections the repo needs.**
+**A skill for Claude (or any AI agent). It reads every file, runs every command, and writes a README with real output.**
 
 ![Skill](https://img.shields.io/badge/type-agent%20skill-informational) ![Python 3.10–3.13](https://img.shields.io/badge/python-3.10%E2%80%933.13%20tested-blue) ![Status](https://img.shields.io/badge/status-working-green)
 
@@ -10,62 +10,64 @@
 
 ## What is it?
 
-Point it at a folder. It reads every file, runs the repo's own commands, and writes a README whose every claim was checked against the code that day — for the developer or PM who lands on the repo with no context.
+Point it at a folder. You get a README a developer or PM can use with no prior context.
+
+Two scripts do the mechanical work. `inventory.py` writes a checklist of every file. `lint.py`, the checker, fails the README on a broken link or filler word.
 
 ```bash
-python3 inventory.py ~/Downloads/workflow-studio        # writes readme-inventory.md: every file, ticked as you read
+python3 inventory.py ~/Downloads/workflow-studio        # writes readme-inventory.md, a checklist of every file
 python3 lint.py ~/Downloads/workflow-studio/README.md   # exit 1 on a broken link, bad anchor, placeholder, filler word
 ```
 
-> Are you the agent running this skill? Read [SKILL.md](SKILL.md) — that is the procedure. This page is for the person deciding whether to use it.
+> Agent running this skill? Read [SKILL.md](SKILL.md), the procedure. This page is for the person choosing it.
 
 ## Why this and not a README template?
 
-- **Nothing skipped.** [`inventory.py`](inventory.py) lists every file with size, kind, a summary in the file's own words, and what it lets a user run. The writer ticks each line; an unticked line is a visible gap.
-- **Nothing invented.** Every command was run in a scratch folder; every output is what it printed. Dependencies come from the imports — the `yaml` line [in the run below](#what-does-a-run-look-like) was one nobody had declared.
-- **A second pass that cuts.** [CHALLENGER.md](CHALLENGER.md) reads the draft as three readers on three clocks, demands proof for every claim, and deletes any section the reader would not miss.
-- **A linter that fails.** [`lint.py`](lint.py) exits 1 on broken links, dead anchors, `<placeholder>` arguments, 17 filler words (`simply`, `powerful`…), no first-screen command, no License heading.
-- **Reader first.** The writer first names who reads the page, what they came to do, and the doubt that would make them leave — the three lines atop [`readme-inventory.md`](readme-inventory.md).
+- **Nothing skipped.** You get a checklist of every file: size, kind, one-line summary. The writer checks off each line; an unchecked line is a gap.
+- **Nothing invented.** Every command was run in a scratch folder. Every output is what it printed. [In the run below](#what-does-a-run-look-like), the imports turned up a `yaml` nobody had declared.
+- **A second review that cuts.** A fresh reader ([CHALLENGER.md](CHALLENGER.md)) reads the draft on a 10-second, 60-second and 10-minute clock. It demands proof for every claim and cuts any section you would not miss.
+- **A checker that fails.** [`lint.py`](lint.py) exits 1 on broken links, dead anchors, `<placeholder>` arguments and 28 filler words (`simply`, `powerful`…). It also fails a page with no first-screen command or License heading.
+- **Reader first.** Before writing, the skill names who reads the page, what they came for, and what would make them leave. Those lines open [the checklist](readme-inventory.md).
 
 ## What is in the folder?
 
 | File | What question it answers | Size |
 |---|---|---|
-| [`SKILL.md`](SKILL.md) | How is a README written? Seven steps, the 38-row section menu with a "use when" per row, rules for monorepos, documents-only repos, existing READMEs, secrets and commands that cannot be run, ten anti-patterns. | 170 lines |
-| [`CHALLENGER.md`](CHALLENGER.md) | Is the draft honest and short enough? Six tests; writes `readme-challenge.md` as a cut / prove / add / move list. | 53 lines |
-| [`inventory.py`](inventory.py) | What is in this repo? Detects 14 entrypoint patterns (`main`s in Python, Node, Go, Rust, Java, Kotlin, C#, C, Ruby and shell; CLI parsers; web servers), 29 manifest types, npm scripts, Make and Just targets, Dockerfiles, CI, env examples, tests, agent instruction files, non-stdlib Python imports. | 376 lines |
-| [`lint.py`](lint.py) | Would a first-time reader trip over this README? | 189 lines |
+| [`SKILL.md`](SKILL.md) | How is a README written? Seven steps and a menu of 38 sections, each with a "use when". Rules for monorepos, documents-only repos, existing READMEs, secrets, and commands that cannot be run. Ten anti-patterns. | 181 lines |
+| [`CHALLENGER.md`](CHALLENGER.md) | Is the draft honest and short enough? Seven tests, including a plain-words read. Writes `readme-challenge.md`, a list of what to cut, prove, add, move, or reword. | 58 lines |
+| [`inventory.py`](inventory.py) | What is in this repo? Finds 14 kinds of entry point (`main`s in Python, Node, Go, Rust, Java, Kotlin, C#, C, Ruby and shell; CLI parsers; web servers), 29 manifest types, npm scripts, Make and Just targets, Dockerfiles, CI, env examples, tests, agent instruction files, and non-stdlib Python imports. | 376 lines |
+| [`lint.py`](lint.py) | Would a first-time reader trip over this README? | 190 lines |
 
 ## How does a run flow?
 
+You get a README only after every file on the checklist is checked off and the checker prints `OK`.
+
 ```mermaid
 flowchart LR
-    S1[1 Inventory] --> S2[2 Decide who reads it]
-    S2 --> S3[3 Extract the offer]
-    S3 --> S4[4 Run the demo for real]
-    S4 --> S4b[4b Make the visuals]
-    S4b --> S5[5 Pick from the menu]
-    S5 --> S6[6 Write]
-    S6 --> S7{7 Challenge, then lint}
-    S7 -- findings --> S6
-    S7 -- OK --> R[README.md]
+    A[Read every file] --> B[Decide who reads it]
+    B --> C[Write down what the repo offers]
+    C --> D[Run the commands for real]
+    D --> E[Make the pictures]
+    E --> F[Pick the sections]
+    F --> G[Write the draft]
+    G --> H{Review, then check}
+    H -- fixes --> G
+    H -- OK --> R[README.md]
 ```
-
-Step 1 ends only when `grep -c '^- \[ \]' readme-inventory.md` prints `0`; step 7 only when `lint.py` prints `OK`.
 
 ## How do I install and use it?
 
-Python 3.10–3.13, standard library only.
+You need Python 3.10–3.13, nothing else; the scripts are standard library only.
 
-**In Claude (Cowork / Claude Code):** copy this folder to `~/.claude/skills/github-readme-writer/`, then ask:
+**In Claude (Cowork / Claude Code):** copy this folder to `~/.claude/skills/github-readme-writer/`. Then ask:
 
 ```
 Write the README for ~/Downloads/workflow-studio using the github-readme-writer skill.
 ```
 
-Not run while writing this README: needs a Claude session.
+Not run for this README: it needs a Claude session.
 
-**By hand, in any tool:** run the two scripts and follow `SKILL.md` steps 2–7 yourself.
+**By hand, in any tool:** run the two scripts, then follow `SKILL.md` steps 2–7.
 
 ```bash
 python3 inventory.py ~/Downloads/workflow-studio --out ~/Downloads/workflow-studio/readme-inventory.md
@@ -80,7 +82,7 @@ python3 lint.py ~/Downloads/workflow-studio/README.md --max-body-words 1800 --mi
 
 ## What does a run look like?
 
-The target is `workflow-studio`, a 66-file framework for shipping a product with one PM and one AI, in the folder next to this one.
+The target is `workflow-studio`, a 66-file framework for shipping a product with one PM and one AI. It sits next to this folder.
 
 `inventory.py` printed:
 
@@ -88,7 +90,7 @@ The target is `workflow-studio`, a 66-file framework for shipping a product with
 wrote workflow-studio/readme-inventory.md (66 files listed, 3 folders skipped)
 ```
 
-Its head maps the repo; its tail names the undeclared dependency:
+The checklist starts with a map of the repo:
 
 ```
 ## By top-level folder
@@ -99,6 +101,8 @@ Its head maps the repo; its tail names the undeclared dependency:
 - `workflows/` — 4 files
 - `docs/` — 2 files
 ```
+
+It ends with the undeclared dependency:
 
 ```
 ## Python imports that are not stdlib (verify each is declared)
@@ -127,21 +131,21 @@ warning: body prose is 11 words (< 150); fine for a tiny repo, otherwise the rea
   - no License section (say 'No license yet' if there is no LICENSE file)
 ```
 
-If it refuses: `inventory.py` given a file prints `not a directory (pass the repo folder, not a file): …` and exits 1; a missing path prints `does not exist: …`.
+Pass the wrong thing and the scripts say so. `inventory.py` given a file prints `not a directory (pass the repo folder, not a file): …` and exits 1. A missing path prints `does not exist: …`.
 
 ## What does a run leave behind?
 
-1. `README.md`, plus `README.prev.md` if a README existed.
-2. `readme-inventory.md` (ticked) and `readme-challenge.md` beside it — keep for the next writer or delete before commit. This repo keeps its own: [inventory](readme-inventory.md), [challenge](readme-challenge.md), [previous README](README.prev.md).
-3. A note to the owner: reader, job, doubt; files ticked out of total; sections chosen and skipped; commands not run; old claims dropped.
+1. `README.md`, plus `README.prev.md` if a README already existed.
+2. The completed checklist, `readme-inventory.md`, and the review notes, `readme-challenge.md`. Keep for the next writer or delete before commit. This repo keeps its own: [checklist](readme-inventory.md), [review notes](readme-challenge.md), [previous README](README.prev.md).
+3. A note to the owner: the reader, files read out of total, sections chosen and skipped, commands not run, claims dropped.
 
 ## What is it not?
 
-Not a template generator: no README without reading the code. Not a docs site builder: prose beyond 1,800 words fails lint and goes to `docs/`. Not a substitute for running the software: a command that cannot be run is shown without output, and the README says why. Not a secret scanner: it refuses to read `.env` and key files but does not audit code for embedded credentials. Not a browser: the screenshot step needs Playwright or Chromium, not shipped here.
+Not a template generator: no README without reading the code. Not a docs site builder: prose beyond 1,800 words fails the checker and goes to `docs/`. Not a substitute for running the software: a command that cannot run is shown without output, with the reason. Not a secret scanner: it skips `.env` and key files but does not audit code for credentials. Not a browser: screenshots need Playwright or Chromium, not shipped here.
 
 ## Where did it come from?
 
-The menu and rules were distilled from the READMEs of github/spec-kit, astral-sh/uv, fastapi/fastapi, httpie/cli, charmbracelet/gum, BurntSushi/ripgrep, openai/openai-agents-python and anthropics/claude-code, and from rewriting the README of [workflow-studio](https://github.com/rishabhrawat35/workflow-studio) after its first version was rejected for "showing nothing".
+The rules were distilled from eight READMEs: github/spec-kit, astral-sh/uv, fastapi/fastapi, httpie/cli, charmbracelet/gum, BurntSushi/ripgrep, openai/openai-agents-python and anthropics/claude-code. Then tested on [workflow-studio](https://github.com/rishabhrawat35/workflow-studio), whose first README was rejected for "showing nothing".
 
 ## License
 

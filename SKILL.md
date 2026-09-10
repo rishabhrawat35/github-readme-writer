@@ -132,16 +132,27 @@ A 38-row menu is not a 38-section README. A typical tool uses 10–14 rows; a co
 
 Repos that do these well, for reference when a section feels off: github/spec-kit (get-started steps with real prompts; command tables split core/optional; quickstart as bold-verb list), astral-sh/uv (highlights with concrete claims; FAQ), fastapi/fastapi (run it → check it, with output), httpie/cli and charmbracelet/gum (demo GIF first; one section per command), BurntSushi/ripgrep ("why should I" *and* "why shouldn't I"), openai/openai-agents-python (code → **Output:** block; redirect blockquote), anthropics/claude-code (whole README under 80 lines when the docs live elsewhere).
 
-## Step 6 — Write
+## Step 6 — Write in plain words
 
-- Length: body prose 600–1,800 words for a tool or framework; a 3-file script or a documents-only repo may go down to the lint floor of 150. Tables and code blocks do not count. Deep material goes to `docs/` and gets a link.
-- The first 50 words answer what, why different, for whom. A command appears before the first scroll.
-- Sentences are short. No adjectives that cannot be checked ("powerful", "seamless", "robust"). No "simply", "just", "easy".
-- One idea per section. If two sections say the same thing, delete one.
-- Realistic arguments in every command (`/speckit-specify Refund within 7 days for unused policies`, not `/speckit-specify <feature>`).
-- Every relative link and image path exists. Every TOC anchor matches GitHub's rule (lowercase, spaces → `-`, punctuation and emoji stripped, one leading `-` if the heading started with an emoji).
-- Emoji on H2 only, or nowhere. Never in body text.
-- The reader from Step 2 must be able to complete the job from Step 2 using only the README. Read it once as that person.
+The reader has never seen this repo, is short on time, and wants to act. Write so they can.
+
+**Voice rules (each one has a test):**
+
+1. **Say what the reader gets or does, not how the tool works inside.** Test: does the sentence answer "what do I get?" or "what do I do?" If it only describes machinery, cut it or move it to the agent's file.
+   Bad: "Step 1 ends only when `grep -c '^- \[ \]' readme-inventory.md` prints `0`."
+   Good: "You get a checklist of every file in the repo. The README is not written until every line is ticked."
+2. **Introduce before you use.** A file name, command, or term appears in prose only after one sentence has said what it is for. Test: cover the name — can the reader still tell what it does?
+3. **One idea per sentence, one job per section.** Sentences under 20 words. A section heading is the question the reader has ("How do I install it?"), not a label ("Installation").
+4. **Numbers over adjectives, verbs over nouns.** "Checks 66 files in 2 seconds" beats "fast and thorough". "Finds broken links" beats "link validation".
+5. **No filler, no marketing.** Cut "powerful", "seamless", "robust", "simply", "just", "easy", "comprehensive", "leverage", "empower", "unlock", "ensure", "delve", "streamline", "elevate". Cut any sentence that would be true of every repo on GitHub.
+6. **Steps are numbered and each is one action.** Commands come with a realistic argument (`~/Downloads/my-repo`, not `<path>`) and, where run, their output.
+7. **Explain the first time, then stop.** A concept gets one plain-language line on first use and never gets re-explained.
+8. **Lead every section with the payoff.** First line: what the reader gets. Then how. Never the reverse.
+9. **Internal terms stay internal.** "Step 4b", "the challenger pass", "tick the inventory" belong to the agent and the owner note; the README says "a second review", "a checklist of files".
+
+**Form rules:** body prose 600–1,800 words for a tool or framework (a 3-file script or a documents-only repo may go down to 150; tables and code blocks do not count; deeper material goes to `docs/` with a link). First 50 words answer what, why different, for whom. A command before the first scroll. Emoji on H2 only, or nowhere. Every relative link and image exists; every TOC anchor matches GitHub's rule (lowercase, spaces → `-`, punctuation and emoji stripped, one leading `-` if the heading started with an emoji).
+
+**Final read:** read the whole page once as the reader from Step 2, out loud in your head. Every sentence you would skip, cut. Every sentence you would stop and re-read, rewrite.
 
 ## Step 7 — Challenge, then lint
 

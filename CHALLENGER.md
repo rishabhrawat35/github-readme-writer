@@ -28,7 +28,11 @@ From the inventory: every document, script, template, dataset, example, or exter
 
 For each section, ask: if this were deleted, what would the reader fail to do? If the answer is "nothing", delete it. Prose repeated in two sections → keep the one closer to where the reader acts. A table with one row of real variation → prose.
 
-## 6. Form
+## 6. Plain words
+
+Read every sentence as someone who has never seen the repo. Flag any sentence that names a file, command, step number or internal term before the page has said what it is for; any sentence that describes machinery instead of what the reader gets or does; any sentence over 20 words; any word from the filler list in SKILL.md step 6. Each flag is a `[reword]` line with the replacement.
+
+## 7. Form
 
 - First screen (before the first scroll, ~25 lines): name, tagline, one image or output block, one command. Nothing else.
 - Tables only where the reader compares; prose where the reader decides.
@@ -47,7 +51,8 @@ Scanner lost at: … / Evaluator lost at: … / Operator lost at: …
 - [prove] <claim> — <what evidence to add or how to reword>
 - [add] <resource> — link from <section>
 - [move] <section> — <where and why>
+- [reword] <sentence> — <plain replacement>
 - [keep] <section> — <takeaway it serves>
 ```
 
-The writer applies every `cut`, `prove`, `add`, `move`, then runs `lint.py`. A finding the writer rejects is listed in the owner note with the reason.
+The writer applies every `cut`, `prove`, `add`, `move`, `reword`, then runs `lint.py`. A finding the writer rejects is listed in the owner note with the reason.

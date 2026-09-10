@@ -19,7 +19,8 @@ from pathlib import Path
 
 BANNED = ["simply", "just", "easy", "easily", "powerful", "seamless", "seamlessly", "robust",
           "cutting-edge", "state-of-the-art", "blazing", "leverage", "leverages", "best-in-class",
-          "world-class", "effortless", "effortlessly"]
+          "world-class", "effortless", "effortlessly", "comprehensive", "empower", "empowers", "unlock",
+          "delve", "streamline", "streamlines", "elevate", "game-changing", "ensure", "ensures"]
 HTML_TAGS = {"a", "abbr", "b", "br", "blockquote", "code", "dd", "del", "details", "div", "dl", "dt",
              "em", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "i", "img", "ins", "kbd", "li", "ol",
              "p", "picture", "pre", "s", "samp", "small", "source", "span", "strong", "sub",
