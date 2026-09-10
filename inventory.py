@@ -246,7 +246,7 @@ def main():
         sys.exit(f"does not exist: {root}")
     if not root.is_dir():
         sys.exit(f"not a directory (pass the repo folder, not a file): {root}")
-    out = Path(a.out) if a.out else root / "readme-inventory.md"
+    out = Path(a.out).resolve() if a.out else root / "readme-inventory.md"
     ignored = gitignored(root)
 
     files, links, skipped, unreadable = [], [], [], []

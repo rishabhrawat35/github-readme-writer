@@ -15,7 +15,7 @@ Ground rules that never change:
 - **Inventory before prose.** Every file in the folder is opened and read before one sentence is written; only vendored/generated folders, binaries and secret files are listed without reading. A README that misses a feature is wrong, not short.
 - **Nothing unverified.** Every command shown was run; every output shown is what it printed; every path, count and claim was checked in the repo. If it cannot be verified, it is not written.
 - **Reader first.** The reader is the end user of the repo, on the repo's GitHub page, with no context. Not the author, not you.
-- **Menu, not checklist.** Section 5 lists everything a README *can* contain. Pick what this repo needs. A 300-line README for a 3-file script is a failure; so is a 40-line README for a framework.
+- **Menu, not checklist.** Step 5 lists everything a README *can* contain. Pick what this repo needs. A 300-line README for a 3-file script is a failure; so is a 40-line README for a framework.
 - **Never leak, never destroy.** No content of `.env`, keys, tokens or credentials goes into the README or the inventory — only the variable *names*, from `.env.example` or the code. If a real secret file exists, tell the owner; do not print it. Never overwrite an existing README without a copy (`README.prev.md` beside it, deleted by the owner, or a clean git history). Run nothing that deploys, publishes, pushes, deletes or spends money.
 
 ## Step 1 — Inventory (do not skip, do not sample)
@@ -54,8 +54,8 @@ Everything in the README serves the job and answers the doubt. If a repo has two
 
 From the inventory, write the offer in plain words, as a list you will later turn into sections:
 
-- What it is, in one sentence a stranger understands (name → verb phrase → for whom).
-- The 3–7 things it does for the reader, each with the evidence file that proves it.
+- What it is, in one sentence a stranger understands (name → verb phrase → for whom). This sentence is the USP: what it does that the alternatives do not.
+- The 3–7 things it does for the reader (the key features), each with the evidence file that proves it.
 - What it needs (runtime, versions, dependencies, accounts, keys) — from the code, not from memory. `import yaml` means PyYAML is a dependency even if nobody wrote it down.
 - What it deliberately does not do.
 - How a user gets from zero to first result, as the exact commands, run by you.
