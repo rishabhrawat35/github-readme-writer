@@ -1,6 +1,6 @@
 ---
 name: github-readme-writer
-description: 'Writes or rewrites the README of a repository so an end user gets full context in one read: what it is, who it is for, what it does, how to install and use it, with real commands and real output. Walks every file in the folder first (nothing skipped), builds an inventory, then picks only the sections this repo needs from a full menu. Use when someone asks for a README, says the current one "shows nothing", or wants a repo presentable on GitHub.'
+description: "Writes or rewrites a repository's README in a professional, structured register that anyone opening the repository for the first time can act on: every file inventoried, every command run for real output, screenshots or diagrams produced when missing, 10-14 sections chosen from a 38-row menu, then a second review against eleven acceptance criteria (CHALLENGER.md) and a checker (lint.py) that rejects eight mechanical AI tells. Use when asked for a README or when one \"shows nothing\"."
 metadata:
   tags: "README, Documentation, Developer Experience, GitHub"
   category: "documentation"
