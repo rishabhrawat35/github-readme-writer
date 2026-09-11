@@ -2,9 +2,9 @@
 
 This file directs the second review of a README draft. The reviewer works in a fresh context with the repository, the inventory and this file, and does not see the writer's reasoning. The reviewer cuts, proves and reorders; the reviewer does not add sections for completeness. The review runs after the draft and before `lint.py`, the checker described in SKILL.md Step 7.
 
-## Content tests (R1 to R9)
+## Content tests (R1 to R10)
 
-The labels match the nine writing rules in SKILL.md Step 6. Each test is applied to every sentence of the draft, including bullets, labels, table cells and bold lead-ins.
+The labels match the ten writing rules in SKILL.md Step 6. Each test is applied to every sentence of the draft, including bullets, labels, table cells and bold lead-ins.
 
 | Test | What the reviewer checks | Finding type |
 |---|---|---|
@@ -17,6 +17,27 @@ The labels match the nine writing rules in SKILL.md Step 6. Each test is applied
 | R7 Length | No concept explained in SKILL.md is re-explained in the README. Body prose is 400 to 900 words for a tool of this size. | `[cut]` |
 | R8 Reader benefit | Every sentence states what the reader gets or does; a sentence that only describes machinery is cut, and internal step names stay out of the README. | `[cut]` |
 | R9 Numbers and single actions | Every claim carries a count made during this run; every step is one action with a realistic argument and, where run, its output. | `[prove]` |
+| R10 Judgment tells | No sentence carries one of the thirteen judgment tells listed under this table. A tell a careful writer might have chosen on purpose counts only where several share a passage. The word list and the fixed constructions are left to `lint.py`. | `[reword]` |
+
+### The thirteen judgment tells of R10
+
+The reviewer reads each sentence once against this list, which is rule R10 of SKILL.md Step 6. No script decides any of them, and `lint.py` holds the word list and the fixed constructions. The reviewer reports:
+
+- a staged run-up before the point
+- an argument with an objection nobody raised
+- a triad that arrives because three sounds complete
+- a qualifier stacked on a qualifier
+- a hyphenated pair kept after the noun it modifies
+- a passive that hides who acts
+- a vague "associated with" in place of the real relationship
+- an -ing rider bolted onto a fact
+- a sales sentence
+- an unnamed expert
+- a send-off paragraph promising a future
+- a sentence describing what the previous README said
+- bold on a phrase that is not a lead-in stating its own content
+
+A tell in the draft is reported as `[reword]` with the replacement sentence, in the form the Output section below gives.
 
 ## Reader tests
 
@@ -52,7 +73,7 @@ Before scoring, the reviewer re-runs every command in the draft from a scratch c
 
 ## Scoring: acceptance criteria
 
-A round passes when every criterion below is true and the reviewer reports zero must-fix findings. A must-fix finding is one that makes any of A1 to A10 false; every other finding is should-fix, and the writer applies it or rejects it with a reason in the owner note.
+A round passes when every criterion below is true and the reviewer reports zero must-fix findings. A must-fix finding is one that makes any of A1 to A11 false; every other finding is should-fix, and the writer applies it or rejects it with a reason in the owner note.
 
 | Criterion | Statement |
 |---|---|
@@ -66,8 +87,9 @@ A round passes when every criterion below is true and the reviewer reports zero 
 | A8 | `python3 lint.py README.md` prints OK, and every relative link resolves. |
 | A9 | README body prose is within 400 to 900 words. |
 | A10 | SKILL.md, CHALLENGER.md, README.md and the two scripts agree on every count, name and step. |
+| A11 | Zero judgment tells from R10 survive in the draft, and a lone tell a careful writer might have chosen on purpose counts only where several share a passage. |
 
-A maximum of three rounds is allowed. If the third round still fails, the reviewer lists the open criteria in the owner note and the README does not ship.
+A maximum of three rounds is allowed. If the third round still fails, the reviewer lists the open criteria from A1 to A11 in the owner note and the README does not ship.
 
 ## Output
 
@@ -85,7 +107,7 @@ Verification: commands re-run …; outputs match …; counts match …; links re
 - [reword] (must-fix, A1) <sentence> — <replacement>
 - [restructure] (must-fix, A4) <paragraph> — <list or table to replace it>
 - [keep] <section> — <takeaway it serves>
-Score: A1 pass/fail … A10 pass/fail
+Score: A1 pass/fail … A11 pass/fail
 Must-fix findings: <count>, listed above with the criterion each fails
 ```
 

@@ -8,6 +8,8 @@ metadata:
 
 # GitHub README Writer
 
+**Version 1.1.0** · 1.0.0 is the commit that introduced R1 to R9 and A1 to A10. Keep this in step with the account skill's description, which is the only version the desktop app shows. Bump patch for wording, minor for a new rule or criterion, major for a change to the seven steps.
+
 This skill produces a README that a first-time visitor can act on without opening the code, in seven numbered steps.
 
 ## Ground rules
@@ -16,7 +18,7 @@ This skill produces a README that a first-time visitor can act on without openin
 2. **Nothing unverified appears in the README.** Every command shown was run, every output shown is what it printed, and every path, count and claim was checked during this run.
 3. **The reader is anyone opening the repository for the first time.** The audience is narrowed only when the repository is built for one group alone, and the README states why.
 4. **The section menu in Step 5 is a menu, not a checklist.** A typical tool uses 10 to 14 of its 38 rows.
-5. **The nine writing rules in Step 6 each carry a test and a fails/passes pair.**
+5. **The ten writing rules in Step 6 each carry a test and a fails/passes pair.**
 6. **No secret is leaked and nothing is destroyed.** Only variable names from `.env.example` or the code appear in the README; an existing README is copied to `README.prev.md` before it is overwritten; nothing that deploys, publishes, pushes, deletes or spends money is run.
 
 ## Step 1 — Inventory every file in the repository
@@ -138,7 +140,7 @@ Interview questions and "learning outcomes" sections are rejected because they s
 
 ## Step 6 — Write the draft under the writing rules
 
-Each rule carries a test and an example pair. CHALLENGER.md tests the rules under the same labels, R1 to R9.
+Each rule carries a test and an example pair. CHALLENGER.md tests the rules under the same labels, R1 to R10.
 
 1. **R1 The register is professional.** Test: every sentence, bullet, label, prose table cell and bold lead-in has a subject and a verb; no heading is a question; no sentence is true of every repository; no opener is casual.
    Fails: "Nothing skipped." and "Why this and not a template?"
@@ -167,24 +169,41 @@ Each rule carries a test and an example pair. CHALLENGER.md tests the rules unde
 9. **R9 Numbers replace adjectives, and every step is one action.** Test: a claim carries a count made during this run; a command carries a realistic argument (`~/Downloads/my-repo`, not `<path>`) and its output where it was run.
    Fails: "a fast and thorough checker"
    Passes: "The inventory script lists 66 files in under one second."
+10. **R10 No AI tell survives a judgment read.** Test: each sentence is read once against the thirteen tells below, none of which a script decides. A tell a careful writer might have chosen on purpose counts only where several share a passage, and the word list and the fixed constructions are `lint.py`'s work rather than this rule's. The rule cuts:
+    - a staged run-up before the point
+    - an argument with an objection nobody raised
+    - a triad that arrives because three sounds complete
+    - a qualifier stacked on a qualifier
+    - a hyphenated pair kept after the noun it modifies
+    - a passive that hides who acts
+    - a vague "associated with" in place of the real relationship
+    - an -ing rider bolted onto a fact
+    - a sales sentence
+    - an unnamed expert
+    - a send-off paragraph promising a future
+    - a sentence describing what the previous README said
+    - bold on a phrase that is not a lead-in stating its own content
+
+    Fails: "The inventory script lists every file in the repository as a checklist, ensuring nothing is skipped."
+    Passes: "The inventory script lists every file in the repository as a checklist, and the writer ticks each line only after opening the file."
 
 Form rules: the first 50 words state what the tool is, what makes it different and for whom; a command appears before the first scroll; emoji appear on H2 headings only or nowhere. The final read is done as the reader from Step 2: every sentence that reader would skip is cut, and every sentence that reader would re-read is rewritten.
 
 ## Step 7 — Second review and lint check
 
-`CHALLENGER.md`, the file next to this one, lists the review tests and the acceptance criteria A1 to A10. The draft goes to a second, independent pass in a fresh context with the repository, the inventory and that file; when no fresh context exists, the writer performs the pass after finishing the draft and says so in the owner note. The pass re-runs every command, checks every count, path, link and anchor, confirms that no secret value appears, scores the draft against A1 to A10, and writes `readme-challenge.md` beside the README. One round consists of three actions:
+`CHALLENGER.md`, the file next to this one, lists the review tests and the acceptance criteria A1 to A11. The draft goes to a second, independent pass in a fresh context with the repository, the inventory and that file; when no fresh context exists, the writer performs the pass after finishing the draft and says so in the owner note. The pass re-runs every command, checks every count, path, link and anchor, confirms that no secret value appears, scores the draft against A1 to A11, and writes `readme-challenge.md` beside the README. One round consists of three actions:
 
-1. The reviewer scores the draft against A1 to A10 and writes `readme-challenge.md`.
-2. The writer applies every must-fix finding (one that makes any of A1 to A10 false) and applies or rejects each should-fix finding with a reason in the owner note.
+1. The reviewer scores the draft against A1 to A11 and writes `readme-challenge.md`.
+2. The writer applies every must-fix finding (one that makes any of A1 to A11 false) and applies or rejects each should-fix finding with a reason in the owner note.
 3. The writer runs `lint.py`.
 
 Rounds repeat until a round reports zero must-fix findings, for at most three rounds; after a third failing round the open criteria go into the owner note and the README does not ship.
 
-`lint.py` is the checker that runs after the review: `python3 lint.py <repo>/README.md`. It fails on the faults its docstring lists: broken links and images, anchors that match no heading, an unclosed code fence, placeholders, filler words, a missing first-screen command or License heading, and body prose over 1,800 words. A README ships only after both passes.
+`lint.py` is the checker that runs after the review: `python3 lint.py <repo>/README.md`. It fails on the faults its docstring lists: broken links and images, anchors that match no heading, an unclosed code fence, placeholders, filler words, a missing first-screen command or License heading, and body prose over 1,800 words. It also fails on eight of the nine mechanical AI tells taken from blader/humanizer: a staged "not just X, it is Y" contrast (NOTXBUTY), an AI vocabulary word (AIWORD), an inflated-significance phrase (INFLATED), "serves as" where "is" would do (COPULA), an em dash, en dash or spaced double hyphen outside code (DASH), chat residue such as "Great question" (RESIDUE), three sentences in a row opening on the same content word (OPENER), and a one-line paragraph that restates the heading above it (HEADECHO). Curly quotation marks (CURLY) are the ninth and are advisory: the checker prints them as a note and the run still passes, because most editors curl a quote by themselves. R10 above carries the thirteen tells no script decides, which are the humanizer patterns these nine checks leave alone rather than the judgment half of the nine. A README ships only after both passes.
 
 ## Outputs of one run
 
 1. `README.md` is the deliverable, with `README.prev.md` beside it when a README existed.
 2. `readme-inventory.md` is the ticked inventory with the three Step 2 lines on top, kept or deleted at the owner's wish and never committed half-ticked.
-3. `readme-challenge.md` is the second pass's findings and A1 to A10 score, kept or deleted on the same rule.
+3. `readme-challenge.md` is the second pass's findings and A1 to A11 score, kept or deleted on the same rule.
 4. The owner note states the reader, goal and doubt; files ticked out of the total; sections chosen and skipped, with reasons; commands not run; claims dropped from the old README; and whether the review was a second agent or the writer.

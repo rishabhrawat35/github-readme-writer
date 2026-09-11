@@ -23,8 +23,8 @@ python3 lint.py ~/Downloads/workflow-studio/README.md   # rejects the README on 
 
 - **Every file is read before writing begins.** The inventory script lists every file in the repository as a checklist, and the writer ticks each line only after opening the file. An unticked line is a gap in the README.
 - **Every output block comes from a command that was run.** The commands are run in a scratch copy of the repository. In [the sample run below](#output-of-a-run-on-a-sample-repository), the import scan found a `yaml` dependency that no manifest declared.
-- **A second review cuts what the reader would not miss.** [CHALLENGER.md](CHALLENGER.md) directs a reviewer who reads the draft on a 10-second, 60-second and 10-minute clock, demands proof for every claim, and scores the draft against ten acceptance criteria.
-- **A checker rejects the README on the first fault.** `lint.py` exits 1 on a broken link, a dead anchor, a placeholder argument, one of 28 filler words, a missing first-screen command, or a missing License heading.
+- **A second review cuts what the reader would not miss.** [CHALLENGER.md](CHALLENGER.md) directs a reviewer who reads the draft on a 10-second, 60-second and 10-minute clock, demands proof for every claim, and scores the draft against eleven acceptance criteria.
+- **A checker rejects the README on the first fault.** `lint.py` exits 1 on a broken link, a dead anchor, a placeholder argument, one of 28 filler words, a missing first-screen command, a missing License heading, or one of eight mechanical AI tells, among them an em dash in prose and an inflated phrase.
 - **The reader is named before drafting starts.** The writer records who reads the page, what they came to do, and the doubt that would make them leave.
 
 ## Files in this folder
@@ -41,7 +41,7 @@ python3 lint.py ~/Downloads/workflow-studio/README.md   # rejects the README on 
 | Script | Purpose | Output | Exit status |
 |---|---|---|---|
 | `inventory.py` | It records, for every file, its path, kind, first heading or docstring, and the entry points, manifests, build targets, CI workflows and test folders it detects; it also lists Python imports outside the standard library. | It writes `readme-inventory.md` in the repository, or at the path given by `--out`. | It exits 0 after writing, and 1 when the path does not exist or is not a folder. |
-| `lint.py` | It checks links, images and anchors, code fences, placeholders, banned filler words, the first-screen command, the License heading and the body word count. | It prints one `OK` line, or one line per fault with its line number. | It exits 0 when no fault is found, and 1 otherwise. |
+| `lint.py` | It checks links, images and anchors, code fences, placeholders, banned filler words, the first-screen command, the License heading, the body word count and eight mechanical AI tells; curly quotation marks are printed as an advisory note instead. | It prints one `OK` line, or one line per fault with its line number. | It exits 0 when no fault is found, and 1 otherwise. |
 
 ### What the inventory detects
 
@@ -198,7 +198,7 @@ A wrong argument is refused with a message and exit code 1:
 ## Files a run leaves behind
 
 1. `README.md`, and `README.prev.md` when a README already existed.
-2. `readme-inventory.md`, the completed checklist, and `readme-challenge.md`, the review notes, kept for the next writer or deleted before commit. This folder keeps its own: [checklist](readme-inventory.md), [review notes](readme-challenge.md) and [previous README](README.prev.md).
+2. `readme-inventory.md`, the completed checklist, and `readme-challenge.md`, the review notes, kept for the next writer or deleted before commit. This folder keeps its own: [checklist](readme-inventory.md) and [review notes](readme-challenge.md).
 3. A note to the owner stating the reader, the files read out of the total, the sections chosen and skipped, the commands not run, the claims dropped from the old README, and whether the second review was done by another agent or by the writer.
 
 ## Limits and non-goals
@@ -212,6 +212,8 @@ A wrong argument is refused with a message and exit code 1:
 ## Sources of the rules
 
 The section menu and writing rules follow the READMEs of eight projects: github/spec-kit, astral-sh/uv, fastapi/fastapi, httpie/cli, charmbracelet/gum, BurntSushi/ripgrep, openai/openai-agents-python and anthropics/claude-code.
+
+The AI tells in `lint.py` come from blader/humanizer v3.0.0, which is MIT licensed. Its patterns come from Wikipedia's "Signs of AI writing", maintained by WikiProject AI Cleanup, and from reviews of AI-generated text on Wikipedia and elsewhere.
 
 ## License
 
